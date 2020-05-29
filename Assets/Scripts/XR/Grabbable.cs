@@ -18,6 +18,19 @@ namespace VrPhysicsFramework
             trigger.radius = grabDist;
         }
 
+        public void SetLayer(int layer)
+        {
+            foreach(Transform t in transform)
+            {
+                t.gameObject.layer = layer;
+            }
+        }
+
+        public virtual void OnGrabbed()
+        {
+
+        }
+
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.green;

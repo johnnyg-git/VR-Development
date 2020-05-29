@@ -9,8 +9,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 namespace VrPhysicsFramework
 {
     [RequireComponent(typeof(XRRig))]
-    [RequireComponent(typeof(LocomotionSystem))]
-    [RequireComponent(typeof(SnapTurnProvider))]
+    [RequireComponent(typeof(TurnProvider))]
     public class XRMain : MonoBehaviour
     {
         public static XRMain instance;
@@ -26,9 +25,6 @@ namespace VrPhysicsFramework
         [Tooltip("What to try find for controllers")]
         InputDeviceCharacteristics rightControllerCharacteristics, leftControllerCharacteristics;
 
-        [Header("Locomation")]
-        public bool useSnapTurning = false;
-
         [Header("Grabbing setup")]
         [Tooltip("Max grabbing distance for hands")]
         public float grabReach = 0.15f;
@@ -42,10 +38,6 @@ namespace VrPhysicsFramework
         {
             if(instance!=null)
                 throw new Exception("XRMain already exists");
-            if(!useSnapTurning)
-                GetComponent<SmoothTurnProvider>().enabled = true;
-            else
-                GetComponent<SnapTurnProvider>().enabled = true;
 
             instance = this;
             Time.fixedDeltaTime = Time.timeScale / XRDevice.refreshRate;

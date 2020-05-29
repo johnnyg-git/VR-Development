@@ -14,6 +14,8 @@ namespace VrPhysicsFramework
         public handTypes handSide;
 
         public List<Grabbable> grabbables = new List<Grabbable>();
+        public int grabbedLayer = 11;
+        int oldLayer = 9;
 
         public Controller input;
 
@@ -65,6 +67,8 @@ namespace VrPhysicsFramework
             if (grabbables.Count > 0 && input.gripPressed && connectJoint == null)
             {
                 connectJoint = grabbables[0].gameObject.AddComponent<ConfigurableJoint>();
+                oldLayer = grabbables[0].gameObject.layer;
+                grabbables[0].SetLayer(grabbedLayer);
                 connectJoint.autoConfigureConnectedAnchor = false;
                 connectJoint.xDrive = new JointDrive() { positionSpring = 10000, positionDamper = 50, maximumForce = 3.402823e+38f };
                 connectJoint.yDrive = new JointDrive() { positionSpring = 10000, positionDamper = 50, maximumForce = 3.402823e+38f };
@@ -77,6 +81,7 @@ namespace VrPhysicsFramework
             }
             else if (!input.gripPressed && connectJoint != null)
             {
+                grabbables[0].SetLayer(oldLayer);
                 Destroy(connectJoint);
             }
         }

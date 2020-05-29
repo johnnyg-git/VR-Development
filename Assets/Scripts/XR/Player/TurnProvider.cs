@@ -7,71 +7,67 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace VrPhysicsFramework
 {
-    public class SmoothTurnProvider : LocomotionProvider
+    public class TurnProvider : LocomotionProvider
     {
-        /// <summary>
-        /// This is the list of possible valid "InputAxes" that we allow users to read from.
-        /// </summary>
         public enum InputAxes
         {
             Primary2DAxis = 0,
             Secondary2DAxis = 1,
         };
 
-        // Mapping of the above InputAxes to actual common usage values
         static readonly InputFeatureUsage<Vector2>[] m_Vec2UsageList = new InputFeatureUsage<Vector2>[] {
             CommonUsages.primary2DAxis,
             CommonUsages.secondary2DAxis,
         };
 
-        [SerializeField]
+        [Tooltip("Should use snap turn of not")]
+        public bool snapTurn;
+
         [Tooltip("The 2D Input Axis on the primary devices that will be used to trigger a snap turn.")]
-        InputAxes m_TurnUsage = InputAxes.Primary2DAxis;
-        /// <summary>
-        /// The 2D Input Axis on the primary device that will be used to trigger a snap turn.
-        /// </summary>
-        public InputAxes turnUsage { get { return m_TurnUsage; } set { m_TurnUsage = value; } }
+        public InputAxes usedAxis = InputAxes.Primary2DAxis;
 
-        [SerializeField]
         [Tooltip("A list of controllers that allow Snap Turn.  If an XRController is not enabled, or does not have input actions enabled.  Snap Turn will not work.")]
-        List<XRController> m_Controllers = new List<XRController>();
-        /// <summary>
-        /// The XRControllers that allow SnapTurn.  An XRController must be enabled in order to Snap Turn.
-        /// </summary>
-        public List<XRController> controllers { get { return m_Controllers; } set { m_Controllers = value; } }
+        public List<XRController> controllers = new List<XRController>();
 
-        [SerializeField]
+        [Header("Snap turn")]
         [Tooltip("The number of degrees clockwise to rotate when snap turning clockwise.")]
-        float m_TurnAmount = 45.0f;
-        /// <summary>
-        /// The number of degrees clockwise to rotate when snap turning clockwise.
-        /// </summary>
-        public float turnAmount { get { return m_TurnAmount; } set { m_TurnAmount = value; } }
+        public float turnAmount;
 
-        [SerializeField]
+        [Tooltip("The amount of time that the system will wait before starting another snap turn.")]
+        public float waitTime = 0.5f;
+
         [Tooltip("The deadzone that the controller movement will have to be above to trigger a snap turn.")]
-        float m_DeadZone = 0.75f;
-        /// <summary>
-        /// The deadzone that the controller movement will have to be above to trigger a snap turn.
-        /// </summary>
-        public float deadZone { get { return m_DeadZone; } set { m_DeadZone = value; } }
+        public float deadZone = 0.75f;
 
-        // state data
+        [Header("Smooth turn")]
+        [Tooltip("The number of degrees clockwise to rotate a second when smooth turning")]
+        public float turnPerSecond;
+
+        [Tooltip("The deadzone that the controller movement will have to be above to trigger smooth turning")]
+        public float smoothDeadZone = 0.75f;
+
         float m_CurrentTurnAmount = 0.0f;
         float m_TimeStarted = 0.0f;
 
         List<bool> m_ControllersWereActive = new List<bool>();
 
-        private void FixedUpdate()
+        private void Update()
         {
-            if (m_Controllers.Count > 0)
+            // wait for a certain amount of time before allowing another turn.
+            if (snapTurn && m_TimeStarted > 0.0f && (m_TimeStarted + waitTime < Time.time))
+            {
+                m_TimeStarted = 0.0f;
+                return;
+            }
+
+            if (controllers.Count > 0)
             {
                 EnsureControllerDataListSize();
 
-                InputFeatureUsage<Vector2> feature = m_Vec2UsageList[(int)m_TurnUsage];
-                for (int i = 0; i < m_Controllers.Count; i++)
+                InputFeatureUsage<Vector2> feature = m_Vec2UsageList[(int)usedAxis];
+                for (int i = 0; i < controllers.Count; i++)
                 {
-                    XRController controller = m_Controllers[i];
+                    XRController controller = controllers[i];
                     if (controller != null)
                     {
                         if (controller.enableInputActions && m_ControllersWereActive[i])
@@ -80,14 +76,21 @@ namespace VrPhysicsFramework
 
                             Vector2 currentState;
                             if (device.TryGetFeatureValue(feature, out currentState))
-                            {
-                                if (currentState.x > deadZone)
+                            { 
+                                float checkingFor = snapTurn ? deadZone : smoothDeadZone;
+                                if (currentState.x > checkingFor)
                                 {
-                                    StartTurn(m_TurnAmount*Time.fixedDeltaTime);
+                                    if (snapTurn)
+                                        StartTurn(turnAmount);
+                                    else
+                                        StartTurn(turnPerSecond * Time.deltaTime);
                                 }
-                                else if (currentState.x < -deadZone)
+                                else if (currentState.x < -checkingFor)
                                 {
-                                    StartTurn(-m_TurnAmount*Time.fixedDeltaTime);
+                                    if (snapTurn)
+                                        StartTurn(-turnAmount);
+                                    else
+                                        StartTurn(-turnPerSecond * Time.deltaTime);
                                 }
                             }
                         }
@@ -113,14 +116,14 @@ namespace VrPhysicsFramework
 
         void EnsureControllerDataListSize()
         {
-            if (m_Controllers.Count != m_ControllersWereActive.Count)
+            if (controllers.Count != m_ControllersWereActive.Count)
             {
-                while (m_ControllersWereActive.Count < m_Controllers.Count)
+                while (m_ControllersWereActive.Count < controllers.Count)
                 {
                     m_ControllersWereActive.Add(false);
                 }
 
-                while (m_ControllersWereActive.Count < m_Controllers.Count)
+                while (m_ControllersWereActive.Count < controllers.Count)
                 {
                     m_ControllersWereActive.RemoveAt(m_ControllersWereActive.Count - 1);
                 }
@@ -129,11 +132,14 @@ namespace VrPhysicsFramework
 
         internal void FakeStartTurn(bool isLeft)
         {
-            StartTurn(isLeft ? -m_TurnAmount : m_TurnAmount);
+            StartTurn(isLeft ? -turnAmount : turnAmount);
         }
 
         private void StartTurn(float amount)
         {
+            if (snapTurn && m_TimeStarted != 0.0f)
+                return;
+
             if (!CanBeginLocomotion())
                 return;
 
@@ -141,5 +147,4 @@ namespace VrPhysicsFramework
             m_CurrentTurnAmount = amount;
         }
     }
-
 }

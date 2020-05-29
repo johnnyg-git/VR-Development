@@ -16,8 +16,8 @@ TagManager:
   - 
   - PlayerHand
   - Grabbable
-  - 
-  - 
+  - PlayerBody
+  - GrabbedObject
   - 
   - 
   - 

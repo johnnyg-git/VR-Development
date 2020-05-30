@@ -5,6 +5,10 @@ using UnityEngine.XR;
 
 namespace VrPhysicsFramework
 {
+    /// <summary>
+    /// Basic controller input scheme for future use
+    /// To deprecate the use of Unity's XR system and not require you to grab the controller from them
+    /// </summary>
     public class Controller : MonoBehaviour
     {
         internal InputDevice device;
@@ -36,6 +40,9 @@ namespace VrPhysicsFramework
                 supportsHaptics = true;
         }
 
+        /// <summary>
+        /// Set all variables
+        /// </summary>
         private void Update()
         {
             if(device!=null)

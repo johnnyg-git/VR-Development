@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+/// <summary>
+/// Will give the player a collider relative to their camera
+/// </summary>
 public class CameraCollider : MonoBehaviour
 {
     [Tooltip("Radius of the capsule collider")]
@@ -10,6 +13,10 @@ public class CameraCollider : MonoBehaviour
 
     CapsuleCollider col;
 
+    /// <summary>
+    /// Ran before first awake call
+    /// Will create the cameras collider and set it up
+    /// </summary>
     void Start()
     {
         col = new GameObject("Cam Collider").AddComponent<CapsuleCollider>();
@@ -18,13 +25,19 @@ public class CameraCollider : MonoBehaviour
         col.radius = radius;
     }
 
+    /// <summary>
+    /// Ran every physics update
+    /// Recenter the collider and set the height so it is in the correct position
+    /// </summary>
     void FixedUpdate()
     {
         col.height = transform.localPosition.y;
-        col.transform.position = transform.position;
         col.center = new Vector3(0, -col.height / 2, 0);
     }
 
+    /// <summary>
+    /// Draw gizmo to show the players camera collider in the editor without creating a collider
+    /// </summary>
     private void OnDrawGizmosSelected()
     {
         float _height = transform.localPosition.y;

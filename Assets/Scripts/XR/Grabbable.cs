@@ -56,6 +56,7 @@ namespace VrPhysicsFramework
 
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             if (axis > 0)
@@ -86,5 +87,6 @@ namespace VrPhysicsFramework
                 Gizmos.DrawWireSphere(transform.position,grabDist);
             }
         }
+#endif
     }
 }

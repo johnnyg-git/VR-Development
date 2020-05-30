@@ -102,12 +102,14 @@ namespace VrPhysicsFramework
                 // Make anchor move to handles position so object is moved relative to handle
                 connectJoint.anchor = grabbables[0].transform.localPosition;
                 connectJoint.connectedAnchor = Vector3.zero;
+                grabbables[0].rb.interpolation = RigidbodyInterpolation.Interpolate;
             }
             // If holding object but no longer pressing down grip then destroy joint
             else if (!input.gripPressed && connectJoint != null)
             {
                 // Return object to old layer
                 grabbables[0].SetLayer(oldLayer);
+                grabbables[0].rb.interpolation = RigidbodyInterpolation.None;
                 // Destroy the joint
                 Destroy(connectJoint);
             }
@@ -142,11 +144,13 @@ namespace VrPhysicsFramework
         /// <summary>
         /// Will draw the reach of the hand in the editor
         /// </summary>
+#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             // Draw reach in editor
             Gizmos.color = Color.grey;
             Gizmos.DrawWireSphere(transform.position, reach);
         }
+#endif
     }
 }

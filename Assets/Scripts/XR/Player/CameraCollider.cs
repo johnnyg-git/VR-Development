@@ -31,6 +31,7 @@ public class CameraCollider : MonoBehaviour
     /// </summary>
     void FixedUpdate()
     {
+        col.transform.position = transform.position;
         col.height = transform.localPosition.y;
         col.center = new Vector3(0, -col.height / 2, 0);
     }
@@ -38,6 +39,7 @@ public class CameraCollider : MonoBehaviour
     /// <summary>
     /// Draw gizmo to show the players camera collider in the editor without creating a collider
     /// </summary>
+#if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
         float _height = transform.localPosition.y;
@@ -60,4 +62,5 @@ public class CameraCollider : MonoBehaviour
 
         }
     }
+#endif
 }

@@ -53,7 +53,7 @@ namespace VrPhysicsFramework
 
         private void Update()
         {
-            if (input == null && XRMain.instance.controllers.ContainsKey(handSide))
+            if (input == null)
             {
                 try
                 {
@@ -66,18 +66,19 @@ namespace VrPhysicsFramework
             }
             if (grabbables.Count > 0 && input.gripPressed && connectJoint == null)
             {
-                connectJoint = grabbables[0].gameObject.AddComponent<ConfigurableJoint>();
+                connectJoint = grabbables[0].rb.gameObject.AddComponent<ConfigurableJoint>();
                 oldLayer = grabbables[0].gameObject.layer;
                 grabbables[0].SetLayer(grabbedLayer);
                 connectJoint.autoConfigureConnectedAnchor = false;
+                grabbables[0].rb.transform.rotation = transform.rotation * Quaternion.Inverse(grabbables[0].transform.rotation) * grabbables[0].rb.transform.rotation;
                 connectJoint.xDrive = new JointDrive() { positionSpring = 10000, positionDamper = 50, maximumForce = 3.402823e+38f };
                 connectJoint.yDrive = new JointDrive() { positionSpring = 10000, positionDamper = 50, maximumForce = 3.402823e+38f };
                 connectJoint.zDrive = new JointDrive() { positionSpring = 10000, positionDamper = 50, maximumForce = 3.402823e+38f };
                 connectJoint.angularXDrive = new JointDrive() { positionSpring = 10000, positionDamper = 50, maximumForce = 3.402823e+38f };
                 connectJoint.angularYZDrive = new JointDrive() { positionSpring = 10000, positionDamper = 50, maximumForce = 3.402823e+38f };
                 connectJoint.connectedBody = GetComponent<Rigidbody>();
+                connectJoint.anchor = grabbables[0].transform.localPosition;
                 connectJoint.connectedAnchor = Vector3.zero;
-                connectJoint.anchor = Vector3.zero;
             }
             else if (!input.gripPressed && connectJoint != null)
             {
@@ -99,7 +100,7 @@ namespace VrPhysicsFramework
                 catch { }
                 return;
             }
-            if ((((1 << other.gameObject.layer) & grabbable) != 0) && other.gameObject.GetComponent<Grabbable>()) {
+            if ((((1 << other.gameObject.layer) & grabbable) != 0) && other.gameObject.GetComponent<Grabbable>() && !grabbables.Contains(other.gameObject.GetComponent<Grabbable>())) {
                 print("Found grabbable");
                 grabbables.Add(other.gameObject.GetComponent<Grabbable>());
             }

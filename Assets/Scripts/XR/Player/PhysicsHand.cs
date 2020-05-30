@@ -11,7 +11,7 @@ namespace VrPhysicsFramework
 
         void Awake()
         {
-            handRb.transform.parent = null;
+            handRb.transform.parent = transform.parent.parent;
         }
     }
 }

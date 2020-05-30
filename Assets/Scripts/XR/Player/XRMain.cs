@@ -42,25 +42,33 @@ namespace VrPhysicsFramework
             instance = this;
             Time.fixedDeltaTime = Time.timeScale / XRDevice.refreshRate;
             InputDevices.GetDevices(devices);
-
             List<InputDevice> hands = new List<InputDevice>();
-            InputDevices.GetDevicesWithCharacteristics(rightControllerCharacteristics, hands);
-            if (hands.Count > 0)
-            {
-                rightControllerDevice = hands[0];
-                rightControllerInput = rightHand.gameObject.AddComponent<Controller>();
-                controllers[handTypes.right] = rightControllerInput;
-                rightControllerInput.device = rightControllerDevice;
-            }
 
-            InputDevices.GetDevicesWithCharacteristics(leftControllerCharacteristics, hands);
-            if (hands.Count > 0)
+            try
             {
-                leftControllerDevice = hands[0];
-                leftControllerInput = leftHand.gameObject.AddComponent<Controller>();
-                controllers[handTypes.left] = leftControllerInput;
-                leftControllerInput.device = leftControllerDevice;
+                InputDevices.GetDevicesWithCharacteristics(rightControllerCharacteristics, hands);
+                if (hands.Count > 0)
+                {
+                    rightControllerDevice = hands[0];
+                    rightControllerInput = rightHand.gameObject.AddComponent<Controller>();
+                    controllers[handTypes.right] = rightControllerInput;
+                    rightControllerInput.device = rightControllerDevice;
+                }
             }
+            catch { }
+
+            try
+            {
+                InputDevices.GetDevicesWithCharacteristics(leftControllerCharacteristics, hands);
+                if (hands.Count > 0)
+                {
+                    leftControllerDevice = hands[0];
+                    leftControllerInput = leftHand.gameObject.AddComponent<Controller>();
+                    controllers[handTypes.left] = leftControllerInput;
+                    leftControllerInput.device = leftControllerDevice;
+                }
+            }
+            catch { }
         }
 
         private void Update()

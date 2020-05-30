@@ -83,14 +83,14 @@ namespace VrPhysicsFramework
                                     if (snapTurn)
                                         StartTurn(turnAmount);
                                     else
-                                        StartTurn(turnPerSecond * Time.deltaTime);
+                                        StartTurn(turnPerSecond * Time.deltaTime * currentState.x);
                                 }
                                 else if (currentState.x < -checkingFor)
                                 {
                                     if (snapTurn)
                                         StartTurn(-turnAmount);
                                     else
-                                        StartTurn(-turnPerSecond * Time.deltaTime);
+                                        StartTurn(-turnPerSecond * Time.deltaTime * -currentState.x);
                                 }
                             }
                         }

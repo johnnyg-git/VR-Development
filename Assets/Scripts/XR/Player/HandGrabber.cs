@@ -30,6 +30,9 @@ namespace VrPhysicsFramework
         [Tooltip("Input system to get controls from, set at runtime")]
         public Controller input;
 
+        public GameObject selectionPrefab;
+        private GameObject currentSelect;
+
         /// <summary>
         /// Gets grabbable objects around the hand
         /// </summary>
@@ -80,6 +83,19 @@ namespace VrPhysicsFramework
                 catch { }
                 return;
             }
+
+            if (currentSelect!=null && (connectJoint!=null || grabbables.Count==0 || (grabbables.Count>0 && currentSelect.transform.parent != grabbables[0].transform)))
+            {
+                Destroy(currentSelect);
+            }
+
+            if (grabbables.Count > 0 && connectJoint==null && currentSelect == null)
+            {
+                currentSelect = Instantiate(selectionPrefab);
+                currentSelect.transform.parent = grabbables[0].transform;
+                currentSelect.transform.localPosition = Vector3.zero;
+            }
+            
             // If there are grabbables, grip is pressed and not already grabbing then grab
             if (grabbables.Count > 0 && input.gripPressed && connectJoint == null)
             {
@@ -147,9 +163,12 @@ namespace VrPhysicsFramework
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            // Draw reach in editor
-            Gizmos.color = Color.grey;
-            Gizmos.DrawWireSphere(transform.position, reach);
+            if (!Application.isPlaying)
+            {
+                // Draw reach in editor
+                Gizmos.color = Color.grey;
+                Gizmos.DrawWireSphere(transform.position, reach);
+            }
         }
 #endif
     }

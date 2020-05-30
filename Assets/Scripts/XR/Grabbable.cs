@@ -59,32 +59,35 @@ namespace VrPhysicsFramework
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            if (axis > 0)
+            if (!Application.isPlaying)
             {
-                float _height = axis;
-                Vector3 _pos = transform.position;
-                Matrix4x4 angleMatrix = Matrix4x4.TRS(_pos, transform.rotation, Handles.matrix.lossyScale);
-                using (new Handles.DrawingScope(angleMatrix))
+                if (axis > 0)
                 {
-                    Handles.color = Color.green;
-                    var pointOffset = (_height - (grabDist * 2)) / 2;
-                    Handles.DrawWireArc(Vector3.up * pointOffset, Vector3.left, Vector3.back, -180, grabDist);
-                    Handles.DrawLine(new Vector3(0, pointOffset, -grabDist), new Vector3(0, -pointOffset, -grabDist));
-                    Handles.DrawLine(new Vector3(0, pointOffset, grabDist), new Vector3(0, -pointOffset, grabDist));
-                    Handles.DrawWireArc(Vector3.down * pointOffset, Vector3.left, Vector3.back, 180, grabDist);
-                    Handles.DrawWireArc(Vector3.up * pointOffset, Vector3.back, Vector3.left, 180, grabDist);
-                    Handles.DrawLine(new Vector3(-grabDist, pointOffset, 0), new Vector3(-grabDist, -pointOffset, 0));
-                    Handles.DrawLine(new Vector3(grabDist, pointOffset, 0), new Vector3(grabDist, -pointOffset, 0));
-                    Handles.DrawWireArc(Vector3.down * pointOffset, Vector3.back, Vector3.left, -180, grabDist);
-                    Handles.DrawWireDisc(Vector3.up * pointOffset, Vector3.up, grabDist);
-                    Handles.DrawWireDisc(Vector3.down * pointOffset, Vector3.up, grabDist);
+                    float _height = axis;
+                    Vector3 _pos = transform.position;
+                    Matrix4x4 angleMatrix = Matrix4x4.TRS(_pos, transform.rotation, Handles.matrix.lossyScale);
+                    using (new Handles.DrawingScope(angleMatrix))
+                    {
+                        Handles.color = Color.green;
+                        var pointOffset = (_height - (grabDist * 2)) / 2;
+                        Handles.DrawWireArc(Vector3.up * pointOffset, Vector3.left, Vector3.back, -180, grabDist);
+                        Handles.DrawLine(new Vector3(0, pointOffset, -grabDist), new Vector3(0, -pointOffset, -grabDist));
+                        Handles.DrawLine(new Vector3(0, pointOffset, grabDist), new Vector3(0, -pointOffset, grabDist));
+                        Handles.DrawWireArc(Vector3.down * pointOffset, Vector3.left, Vector3.back, 180, grabDist);
+                        Handles.DrawWireArc(Vector3.up * pointOffset, Vector3.back, Vector3.left, 180, grabDist);
+                        Handles.DrawLine(new Vector3(-grabDist, pointOffset, 0), new Vector3(-grabDist, -pointOffset, 0));
+                        Handles.DrawLine(new Vector3(grabDist, pointOffset, 0), new Vector3(grabDist, -pointOffset, 0));
+                        Handles.DrawWireArc(Vector3.down * pointOffset, Vector3.back, Vector3.left, -180, grabDist);
+                        Handles.DrawWireDisc(Vector3.up * pointOffset, Vector3.up, grabDist);
+                        Handles.DrawWireDisc(Vector3.down * pointOffset, Vector3.up, grabDist);
 
+                    }
                 }
-            }
-            else
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireSphere(transform.position,grabDist);
+                else
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawWireSphere(transform.position, grabDist);
+                }
             }
         }
 #endif

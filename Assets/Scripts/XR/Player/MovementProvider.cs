@@ -56,7 +56,7 @@ public class MovementProvider : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (controllers.Count > 0)
         {
